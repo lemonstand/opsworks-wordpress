@@ -49,12 +49,17 @@ Chef::Log.info(deploy.to_json)
     end
 
 
-    site = node[application]
+    site = deploy[application]
 
 
 Chef::Log.info("Short name: #{site}")
 Chef::Log.info("Short name: #{deploy[:application]}")
 Chef::Log.info(node[:wp].to_json)
+
+    if !defined?(node[:wp][site])
+        Chef::Log.info("Missing WordPress stack configuration for #{site}")
+        next
+    end
 
     siteSettings = node[:wp][site]
 
