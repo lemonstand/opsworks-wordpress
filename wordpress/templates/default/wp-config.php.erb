@@ -14,24 +14,20 @@
  * @package WordPress
  */
 
-/** Load RDS settings from opsworks config using stack layer config */
-include 'opsworks.php';
-$RDS = new OpsWorksDb();
-
 /** The name of the database for WordPress */
-define('DB_NAME', $RDS->database);
+define('DB_NAME', '<%= @database %>');
 
 /** MySQL database username */
-define('DB_USER', $RDS->username);
+define('DB_USER', '<%= @user %>');
 
 /** MySQL database password */
-define('DB_PASSWORD', $RDS->password);
+define('DB_PASSWORD', '<%= @password %>');
 
 /** MySQL hostname */
-define('DB_HOST', $RDS->host);
+define('DB_HOST', '<%= @host %>');
 
 /** Database Charset to use in creating database tables. */
-define('DB_CHARSET', $RDS->encoding);
+define('DB_CHARSET', 'utf8');
 
 /** The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
@@ -39,6 +35,8 @@ define('DB_COLLATE', '');
 
 define( 'WP_SITEURL', 'http://<%= @domain %>' );
 define( 'WP_HOME', 'http://<%= @domain %>' );
+define('ALTERNATE_WP_CRON', false);
+define('DISABLE_WP_CRON', true);
 
 
 /**
