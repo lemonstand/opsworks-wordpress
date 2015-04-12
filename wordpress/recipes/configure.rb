@@ -21,7 +21,7 @@ node[:deploy].each do |app_name, appshortname, deploy|
     Chef::Log.info("Configuring WP app #{app_name}...")
 
     if !defined?(deploy[:domains])
-        Chef::Log.debug("Skipping WP Configure for #{app_name} (no domains defined)")
+        Chef::Log.info("Skipping WP Configure for #{app_name} (no domains defined)")
         next
     end
 
@@ -47,8 +47,8 @@ node[:deploy].each do |app_name, appshortname, deploy|
     end
 
 
-Chef::Log.debug("Short name: #{node[:appshortname]}")
-Chef::Log.debug("Theme name: #{node[:appshortname][:theme_app]}")
+Chef::Log.info("Short name: #{node[:appshortname]}")
+Chef::Log.info("Theme name: #{node[:appshortname][:theme_app]}")
 
     if defined?(node[:appshortname])
 
@@ -57,7 +57,7 @@ Chef::Log.debug("Theme name: #{node[:appshortname][:theme_app]}")
         themeBase = "#{moduleBase}/#{node[:appshortname]}/current"
         siteBase = "#{deploy[:deploy_to]}/current"
 
-Chef::Log.debug("Theme base: #{themeBase}")
+Chef::Log.info("Theme base: #{themeBase}")
 
         bash "install_theme_and_plugins" do
             user "deploy"
