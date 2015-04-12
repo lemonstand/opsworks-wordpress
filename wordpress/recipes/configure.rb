@@ -49,10 +49,14 @@ Chef::Log.info(deploy.to_json)
     end
 
 
-Chef::Log.info("Short name: #{application}")
-Chef::Log.info(wp.to_json)
+    site = node[application]
 
-    siteSettings = wp[node[application]]
+
+Chef::Log.info("Short name: #{site}")
+Chef::Log.info("Short name: #{deploy[:application]}")
+Chef::Log.info(node[:wp].to_json)
+
+    siteSettings = node[:wp][site]
 
 Chef::Log.info(siteSettings.to_json)
 
