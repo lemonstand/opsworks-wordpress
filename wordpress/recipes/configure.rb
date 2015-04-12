@@ -17,7 +17,7 @@ keys = response.body
 
 
 # Create the Wordpress config file wp-config.php with corresponding values
-node[:deploy].each do |app_name, appshortname, deploy|
+node[:deploy].each do |app_name, deploy|
     Chef::Log.info("Configuring WP app #{app_name}...")
 Chef::Log.info(deploy.to_json)
     if !defined?(deploy[:domains])
