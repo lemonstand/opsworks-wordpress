@@ -46,47 +46,5 @@ node[:deploy].each do |app_name, deploy|
         )
     end
 
-
-	# Import Wordpress database backup from file if it exists
-	mysql_command = "/usr/bin/mysql -h #{deploy[:database][:host]} -u #{deploy[:database][:username]} -p#{deploy[:database][:password]}  #{deploy[:database][:database]}"
-
-    if defined?(node["restore_wp_database"]) && node["restore_wp_database"].to_s == "true"
-	    Chef::Log.info("RESTORING Wordpress database backup... (restore_wp_databse variable set on deploy json)")
-        Chef::Log.info("restore cmd: #{mysql_command} < #{deploy[:deploy_to]}/current/*.sql;")
-        script "restore_database" do
-            interpreter "bash"
-            user "root"
-            cwd "#{deploy[:deploy_to]}/current/"
-            code <<-EOH
-                if ls #{deploy[:deploy_to]}/current/*.sql &> /dev/null; then
-                    #{mysql_command} < #{deploy[:deploy_to]}/current/*.sql;
-                    mv #{deploy[:deploy_to]}/current/*.sql /root/;
-                    echo "Restore done";
-                fi;
-            EOH
-        end
-    else
-        Chef::Log.info("Not importing wordpress database backup. Set variable restore_wp_database=true in your deploy json, if you want to restore DB from backup")
-        script "move_sql" do
-            interpreter "bash"
-            user "root"
-            cwd "#{deploy[:deploy_to]}/current/"
-            code <<-EOH
-                if ls #{deploy[:deploy_to]}/current/*.sql &> /dev/null; then
-                    mv #{deploy[:deploy_to]}/current/*.sql /root/;
-                fi;
-            EOH
-        end
-    end
-
-    # Create a Cronjob for Wordpress
-    domain = deploy[:domains].first
-    command = "wget --http-user=demo --http-passwd=demo -q -O - http://#{domain}/wp-cron.php?doing_wp_cron >/dev/null 2>&1"
-    cron "wordpress-#{app_name}" do
-        hour "*"
-        minute "*/15"
-        weekday "*"
-        command command
-    end
 end
 
