@@ -49,7 +49,7 @@ Chef::Log.info(deploy.to_json)
     end
 
 
-    site = deploy[application]
+    site = deploy[:application]
 
 
 Chef::Log.info("Short name: #{site}")
