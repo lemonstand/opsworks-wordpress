@@ -47,12 +47,17 @@ node[:deploy].each do |app_name, appshortname, deploy|
     end
 
 
+Chef::Log.debug("Short name: #{node[:appshortname]}")
+Chef::Log.debug("Theme name: #{node[:appshortname][:theme_app]}")
+
     if defined?(node[:appshortname])
 
         theme = node[:appshortname][:theme_app]
         moduleBase = "/srv/www"
         themeBase = "#{moduleBase}/#{node[:appshortname]}/current"
         siteBase = "#{deploy[:deploy_to]}/current"
+
+Chef::Log.debug("Theme base: #{themeBase}")
 
         bash "install_theme_and_plugins" do
             user "deploy"
