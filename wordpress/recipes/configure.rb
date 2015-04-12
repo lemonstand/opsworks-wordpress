@@ -47,12 +47,12 @@ Chef::Log.info(deploy.to_json)
     end
 
 
-Chef::Log.info("Short name: #{node[:appshortname]}")
-Chef::Log.info("Theme name: #{node[:appshortname][:theme_app]}")
+Chef::Log.info("Short name: #{node[:app_short_name]}")
+Chef::Log.info("Theme name: #{node[:app_short_name][:theme_app]}")
 
-    if defined?(node[:appshortname])
+    if defined?(node[:app_short_name])
 
-        theme = node[:appshortname][:theme_app]
+        theme = node[:app_short_name][:theme_app]
         moduleBase = "/srv/www"
         themeBase = "#{moduleBase}/#{node[:appshortname]}/current"
         siteBase = "#{deploy[:deploy_to]}/current"
