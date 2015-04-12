@@ -19,7 +19,9 @@ keys = response.body
 # Create the Wordpress config file wp-config.php with corresponding values
 node[:deploy].each do |app_name, deploy|
     Chef::Log.info("Configuring WP app #{app_name}...")
+
 Chef::Log.info(deploy.to_json)
+
     if !defined?(deploy[:domains])
         Chef::Log.info("Skipping WP Configure for #{app_name} (no domains defined)")
         next
@@ -47,14 +49,17 @@ Chef::Log.info(deploy.to_json)
     end
 
 
-Chef::Log.info("Short name: #{node[:app_short_name]}")
-Chef::Log.info("Theme name: #{node[:app_short_name][:theme_app]}")
+Chef::Log.info("Short name: #{node[:application]}")
 
-    if defined?(node[:app_short_name])
+    siteSettings = node[:wp][node[:application]]
 
-        theme = node[:app_short_name][:theme_app]
+Chef::Log.info(siteSettings.to_json)
+
+    if defined?(siteSettings)
+
+        theme = siteSettings[:theme_app]
         moduleBase = "/srv/www"
-        themeBase = "#{moduleBase}/#{node[:appshortname]}/current"
+        themeBase = "#{moduleBase}/#{theme}/current"
         siteBase = "#{deploy[:deploy_to]}/current"
 
 Chef::Log.info("Theme base: #{themeBase}")
