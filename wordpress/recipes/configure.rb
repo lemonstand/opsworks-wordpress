@@ -17,11 +17,11 @@ keys = response.body
 
 
 # Create the Wordpress config file wp-config.php with corresponding values
-node[:deploy].each do |app_name, deploy|
+node[:deploy].each do |app_name, appshortname, deploy|
     Chef::Log.info("Configuring WP app #{app_name}...")
 
-    if defined?(deploy[:application_type]) && deploy[:application_type] != 'php'
-        Chef::Log.debug("Skipping WP Configure  application #{app_name} as it is not defined as php wp")
+    if !defined?(deploy[:domains])
+        Chef::Log.debug("Skipping WP Configure for #{app_name} (no domains defined)")
         next
     end
 
@@ -46,5 +46,25 @@ node[:deploy].each do |app_name, deploy|
         )
     end
 
+
+    if defined?(node[:appshortname])
+
+        theme = node[:appshortname][:theme_app]
+        moduleBase = "/srv/www"
+        themeBase = "#{moduleBase}/#{node[:appshortname]}/current"
+        siteBase = "#{deploy[:deploy_to]}/current"
+
+        bash "install_theme_and_plugins" do
+            user "deploy"
+            group "apache"
+            code <<-EOH
+              ln -s "#{themeBase}/themes/*" "#{siteBase}/themes/"
+              ln -s "#{themeBase}/plugins/*" "#{siteBase}/plugins/"
+
+#              chmod -R 775 "#{siteBase}/plugins/"
+#              chmod -R 775 "#{siteBase}/themes/"
+            EOH
+        end
+    end
 end
 
