@@ -1,5 +1,5 @@
 <?php
-/** 
+/**
  * The base configurations of the WordPress.
  *
  * This file has the following configurations: MySQL settings, Table Prefix,
@@ -14,21 +14,24 @@
  * @package WordPress
  */
 
-// ** MySQL settings - You can get this info from your web host ** //
+/** Load RDS settings from opsworks config using stack layer config */
+include 'opsworks.php';
+$RDS = new OpsWorksDb();
+
 /** The name of the database for WordPress */
-define('DB_NAME', '<%= @database %>');
+define('DB_NAME', $RDS->database);
 
 /** MySQL database username */
-define('DB_USER', '<%= @user %>');
+define('DB_USER', $RDS->username);
 
 /** MySQL database password */
-define('DB_PASSWORD', '<%= @password %>');
+define('DB_PASSWORD', $RDS->password);
 
 /** MySQL hostname */
-define('DB_HOST', '<%= @host %>');
+define('DB_HOST', $RDS->host);
 
 /** Database Charset to use in creating database tables. */
-define('DB_CHARSET', 'utf8');
+define('DB_CHARSET', $RDS->encoding);
 
 /** The Database Collate type. Don't change this if in doubt. */
 define('DB_COLLATE', '');
@@ -36,8 +39,6 @@ define('DB_COLLATE', '');
 
 define( 'WP_SITEURL', 'http://<%= @domain %>' );
 define( 'WP_HOME', 'http://<%= @domain %>' );
-define('ALTERNATE_WP_CRON', false);
-define('DISABLE_WP_CRON', true);
 
 
 /**
@@ -52,7 +53,7 @@ define('DISABLE_WP_CRON', true);
 <%= @keys %>
 
 <% if node['wordpress']['wp_config']['enable_W3TC']==true -%>
-/** 
+/**
  * Enable W3 Total Cache
  */
 define('WP_CACHE', true); // Added by W3 Total Cache
