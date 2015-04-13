@@ -59,7 +59,7 @@ node[:deploy].each do |app_name, deploy, application, wp|
     theme = siteSettings[:theme]
     moduleBase = "/srv/www"
     themeBase = "#{moduleBase}/#{theme}/current"
-    siteBase = "#{deploy[:deploy_to]}/current"
+    siteBase = "#{deploy[:deploy_to]}/current/wp-content"
 
     unless theme.nil?
 
@@ -70,11 +70,8 @@ node[:deploy].each do |app_name, deploy, application, wp|
             user "deploy"
             group "apache"
             code <<-EOH
-              ln -s "#{themeBase}/themes/*" "#{siteBase}/themes"
-              ln -s "#{themeBase}/plugins/*" "#{siteBase}/plugins"
-
-    #              chmod -R 775 "#{siteBase}/plugins/"
-    #              chmod -R 775 "#{siteBase}/themes/"
+              ln -s "#{themeBase}/themes/*" "#{siteBase}/themes/"
+              ln -s "#{themeBase}/plugins/*" "#{siteBase}/plugins/"
             EOH
         end
     end
