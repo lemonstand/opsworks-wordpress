@@ -50,28 +50,26 @@ Chef::Log.info(deploy.to_json)
 
 
     site = deploy[:application]
+    siteSettings = node[:wp]["#{site}"]
 
 
-Chef::Log.info("Short name: #{site}")
-Chef::Log.info("Short name: #{deploy[:application]}")
-Chef::Log.info(node[:wp].to_json)
-
-    if !defined?(node[:wp][site])
+    if siteSettings.nil?
         Chef::Log.info("Missing WordPress stack configuration for #{site}")
+        Chef::Log.info(siteSettings.to_json)
         next
     end
 
+    Chef::Log.info("Looking for theme for #{site}")
 
-    if defined?(node[:wp]["#{site}"])
+    theme = siteSettings[:theme]
+    moduleBase = "/srv/www"
+    themeBase = "#{moduleBase}/#{theme}/current"
+    siteBase = "#{deploy[:deploy_to]}/current"
 
-        siteSettings = node[:wp]["#{site}"]
-Chef::Log.info(siteSettings.to_json)
-        theme = siteSettings[:theme]
-        moduleBase = "/srv/www"
-        themeBase = "#{moduleBase}/#{theme}/current"
-        siteBase = "#{deploy[:deploy_to]}/current"
+    unless theme.nil?
 
-Chef::Log.info("Theme base: #{themeBase}")
+        Chef::Log.info("Installing theme from #{themeBase}")
+        Chef::Log.info("Installing theme to #{siteBase}")
 
         bash "install_theme_and_plugins" do
             user "deploy"
@@ -80,8 +78,8 @@ Chef::Log.info("Theme base: #{themeBase}")
               ln -s "#{themeBase}/themes/*" "#{siteBase}/themes/"
               ln -s "#{themeBase}/plugins/*" "#{siteBase}/plugins/"
 
-#              chmod -R 775 "#{siteBase}/plugins/"
-#              chmod -R 775 "#{siteBase}/themes/"
+    #              chmod -R 775 "#{siteBase}/plugins/"
+    #              chmod -R 775 "#{siteBase}/themes/"
             EOH
         end
     end
