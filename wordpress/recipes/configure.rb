@@ -1,7 +1,5 @@
 # AWS OpsWorks Recipe for Wordpress to be executed during the Configure lifecycle phase
 # - Creates the config file wp-config.php with MySQL data.
-# - Creates a Cronjob.
-# - Imports a database backup if it exists.
 
 require 'uri'
 require 'net/http'
@@ -18,9 +16,7 @@ keys = response.body
 
 # Create the Wordpress config file wp-config.php with corresponding values
 node[:deploy].each do |app_name, deploy, application, wp|
-    Chef::Log.info("Configuring WP app #{app_name}...")
-
-Chef::Log.info(deploy.to_json)
+    Chef::Log.info("Considering configuring WP app #{app_name} via #{deploy[:domains]}...")
 
     if !defined?(deploy[:domains])
         Chef::Log.info("Skipping WP Configure for #{app_name} (no domains defined)")
@@ -52,10 +48,9 @@ Chef::Log.info(deploy.to_json)
     site = deploy[:application]
     siteSettings = node[:wp]["#{site}"]
 
-
     if siteSettings.nil?
-        Chef::Log.info("Missing WordPress stack configuration for #{site}")
-        Chef::Log.info(siteSettings.to_json)
+        Chef::Log.info("Missing WordPress stack configuration for #{site}, not found in:")
+        Chef::Log.info(node[:wp].to_json)
         next
     end
 
