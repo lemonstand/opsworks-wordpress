@@ -18,7 +18,7 @@ keys = response.body
 node[:deploy].each do |app_name, deploy, application, wp|
     Chef::Log.info("Considering configuring WP app #{app_name} via #{deploy[:domains]}...")
 
-    if !defined?(deploy[:domains]) or !deploy[:domains].kind_of?(Array) or !deploy[:domains].length > 1
+    if !defined?(deploy[:domains]) or !deploy[:domains].kind_of?(Array) or deploy[:domains].length <= 1
         Chef::Log.info("Skipping WP Configure for #{app_name} (no domains defined)")
         next
     end
