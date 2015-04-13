@@ -61,12 +61,11 @@ Chef::Log.info(node[:wp].to_json)
         next
     end
 
-    siteSettings = node[:wp][site]
 
+    if defined?(node[:wp][site])
+
+        siteSettings = node[:wp][site]
 Chef::Log.info(siteSettings.to_json)
-
-    if defined?(siteSettings)
-
         theme = siteSettings[:theme]
         moduleBase = "/srv/www"
         themeBase = "#{moduleBase}/#{theme}/current"
