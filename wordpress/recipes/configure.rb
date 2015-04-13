@@ -67,7 +67,7 @@ Chef::Log.info(siteSettings.to_json)
 
     if defined?(siteSettings)
 
-        theme = siteSettings[:theme_app]
+        theme = siteSettings[:theme]
         moduleBase = "/srv/www"
         themeBase = "#{moduleBase}/#{theme}/current"
         siteBase = "#{deploy[:deploy_to]}/current"
