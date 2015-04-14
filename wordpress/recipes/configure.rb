@@ -1,7 +1,5 @@
 # AWS OpsWorks Recipe for Wordpress to be executed during the Configure lifecycle phase
 # - Creates the config file wp-config.php with MySQL data.
-# - Creates a Cronjob.
-# - Imports a database backup if it exists.
 
 require 'uri'
 require 'net/http'
@@ -18,11 +16,9 @@ keys = response.body
 
 # Create the Wordpress config file wp-config.php with corresponding values
 node[:deploy].each do |app_name, deploy, application, wp|
-    Chef::Log.info("Configuring WP app #{app_name}...")
+    Chef::Log.info("Considering configuring WP app #{app_name} via #{deploy[:domains]}...")
 
-Chef::Log.info(deploy.to_json)
-
-    if !defined?(deploy[:domains])
+    if !defined?(deploy[:domains]) or !deploy[:domains].kind_of?(Array) or deploy[:domains].length <= 1
         Chef::Log.info("Skipping WP Configure for #{app_name} (no domains defined)")
         next
     end
@@ -50,38 +46,32 @@ Chef::Log.info(deploy.to_json)
 
 
     site = deploy[:application]
+    siteSettings = node[:wp]["#{site}"]
 
-
-Chef::Log.info("Short name: #{site}")
-Chef::Log.info("Short name: #{deploy[:application]}")
-Chef::Log.info(node[:wp].to_json)
-
-    if !defined?(node[:wp][site])
-        Chef::Log.info("Missing WordPress stack configuration for #{site}")
+    if siteSettings.nil?
+        Chef::Log.info("Missing WordPress stack configuration for #{site}, not found in:")
+        Chef::Log.info(node[:wp].to_json)
         next
     end
 
+    Chef::Log.info("Looking for theme for #{site}")
 
-    if defined?(node[:wp]["#{site}"])
+    theme = siteSettings[:theme]
+    moduleBase = "/srv/www"
+    themeBase = "#{moduleBase}/#{theme}/current"
+    siteBase = "#{deploy[:deploy_to]}/current/wp-content"
 
-        siteSettings = node[:wp]["#{site}"]
-Chef::Log.info(siteSettings.to_json)
-        theme = siteSettings[:theme]
-        moduleBase = "/srv/www"
-        themeBase = "#{moduleBase}/#{theme}/current"
-        siteBase = "#{deploy[:deploy_to]}/current"
+    unless theme.nil?
 
-Chef::Log.info("Theme base: #{themeBase}")
+        Chef::Log.info("Installing theme from #{themeBase}")
+        Chef::Log.info("Installing theme to #{siteBase}")
 
         bash "install_theme_and_plugins" do
             user "deploy"
             group "apache"
             code <<-EOH
-              ln -s "#{themeBase}/themes/*" "#{siteBase}/themes/"
-              ln -s "#{themeBase}/plugins/*" "#{siteBase}/plugins/"
-
-#              chmod -R 775 "#{siteBase}/plugins/"
-#              chmod -R 775 "#{siteBase}/themes/"
+              ln -s #{themeBase}/themes/* "#{siteBase}/themes/"
+              ln -s #{themeBase}/plugins/* "#{siteBase}/plugins/"
             EOH
         end
     end
