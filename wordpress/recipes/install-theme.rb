@@ -6,7 +6,8 @@
 include_recipe 'deploy'
 
 node[:deploy].each do |application, deploy|
-  
+  Chef::Log.info("Deploy for #{application} as #{deploy[:application_type]}...")
+
   if deploy[:application_type] != 'other'
     Chef::Log.debug("Skipping deploy::other application #{application} as it is not configuration or themes")
     next
